@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv/
+
+# OS/System files
+.DS_Store
+Thumbs.db
+
+# VSCode settings
+.vscode/
+*.code-workspace
+
+# Environment variables
+config/.env
+.env
+
+# Pytest / Coverage
+htmlcov/
+.coverage
+.tox/
+.nox/
+.cache/
+.pytest_cache/
+*.cover
+
+# Logs and temp files
+*.log
+*.pot
+*.mo
+*.swp
+*.bak
+*.tmp
+
+# MyPy
+.mypy_cache/
+
+# Railway deployment artifacts
+railway/
+
+# IDEs
+.idea/
+
+# Database files
+*.db
+
+# Docker
+*.pid
+*.tar
+*.sock

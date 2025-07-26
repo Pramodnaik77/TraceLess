@@ -1,0 +1,137 @@
+<!-- templates/success.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>File Uploaded</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .box {
+      background: white;
+      padding: 2rem 2.5rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 500px;
+      width: 90%;
+    }
+
+    .url-box {
+      background: #f3f4f6;
+      padding: 0.8rem 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      border: 1px solid #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      word-break: break-all;
+    }
+
+    .url-text {
+      flex: 1;
+      text-align: left;
+    }
+
+    .icon-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 0 5px;
+      color: #333;
+      transition: color 0.2s ease;
+    }
+
+    .icon-button:hover {
+      color: #2563EB;
+    }
+
+    a {
+      display: inline-block;
+      margin-top: 1.5rem;
+      text-decoration: none;
+      color: #2563EB;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>✅ Upload Successful</h2>
+    <p>Share this one-time download link:</p>
+
+    <div class="url-box">
+      <div class="url-text" id="downloadUrl">{{ download_url }}</div>
+      <button class="icon-button" id="copyBtn" onclick="copyToClipboard()" title="Copy">
+        📋
+      </button>
+      <button class="icon-button" onclick="shareLink()" title="Share">
+        🔗
+      </button>
+    </div>
+
+    <a href="/">⬅️ Upload another file</a>
+  </div>
+
+  <script>
+    function copyToClipboard() {
+      const url = document.getElementById('downloadUrl').innerText;
+      navigator.clipboard.writeText(url).then(() => {
+        const copyBtn = document.getElementById('copyBtn');
+        copyBtn.innerText = '✅';
+        setTimeout(() => {
+          copyBtn.innerText = '📋';
+        }, 1500);
+      }).catch(err => {
+        alert('Failed to copy: ' + err);
+      });
+    }
+
+    function shareLink() {
+      const url = document.getElementById('downloadUrl').innerText;
+
+      if (navigator.share) {
+        navigator.share({
+          title: 'Download File',
+          text: 'Here is your one-time secure download link:',
+          url: url
+        }).catch((error) => console.log('Sharing failed', error));
+      } else {
+        const encoded = encodeURIComponent(url);
+        const options = [
+          { name: "Copy", action: () => copyToClipboard() },
+          { name: "WhatsApp", link: `https://wa.me/?text=${encoded}` },
+          { name: "Telegram", link: `https://t.me/share/url?url=${encoded}` },
+        ];
+
+        let menu = "Choose a sharing method:\n";
+        options.forEach((opt, idx) => {
+          menu += `${idx + 1}. ${opt.name}\n`;
+        });
+
+        const choice = prompt(menu);
+        const selected = options[parseInt(choice) - 1];
+        if (!selected) return;
+
+        if (selected.link) {
+          window.open(selected.link, '_blank');
+        } else if (selected.action) {
+          selected.action();
+        }
+      }
+    }
+  </script>
+</body>
+</html>
