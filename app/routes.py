@@ -29,7 +29,7 @@ async def upload_file(request: Request, file: UploadFile = File(...)):
 
         ext = os.path.splitext(file.filename)[1]
         # filename = f"{uuid4()}{ext}"
-        filename = f"{file.filename}"
+        filename = f"{uuid4()}-{file.filename}"
         token = secrets.token_urlsafe(16)
 
         # Upload encrypted file to Supabase
@@ -91,9 +91,9 @@ async def download_file(request: Request, token: str):
     # Delete file from Supabase & update DB
     supabase.storage.from_(SUPABASE_BUCKET).remove(filename)
     supabase.table("files").update({"status": "used"}).eq("token", token).execute()
-
+    file_name = "-".join(filename.split("-")[1:])  # Extract original filename (after the first hyphen)
     return Response(
         content=decrypted_data,
         media_type="application/octet-stream",
-        headers={"Content-Disposition": f"attachment; filename={filename}"}
+        headers={"Content-Disposition": f"attachment; filename={file_name}"}
     )
