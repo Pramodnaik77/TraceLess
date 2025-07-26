@@ -29,7 +29,7 @@ async def upload_file(request: Request, file: UploadFile = File(...)):
 
         ext = os.path.splitext(file.filename)[1]
         # filename = f"{uuid4()}{ext}"
-        filename = f"{uuid4()}-{file.filename}"
+        filename = f"{uuid4()}_{file.filename}"
         token = secrets.token_urlsafe(16)
 
         # Upload encrypted file to Supabase
@@ -60,6 +60,10 @@ async def upload_file(request: Request, file: UploadFile = File(...)):
 
 @router.get("/download/{token}")
 async def download_file(request: Request, token: str):
+    user_agent = request.headers.get("User-Agent", "").lower()
+    if "whatsapp" in user_agent or "facebook" in user_agent or "telegram" in user_agent or "instagram" in user_agent:
+        return HTMLResponse("Preview not allowed", status_code=403)
+
     result = supabase.table("files").select("*").eq("token", token).single().execute()
 
     if not result or not result.data:
@@ -91,7 +95,7 @@ async def download_file(request: Request, token: str):
     # Delete file from Supabase & update DB
     supabase.storage.from_(SUPABASE_BUCKET).remove(filename)
     supabase.table("files").update({"status": "used"}).eq("token", token).execute()
-    file_name = "-".join(filename.split("-")[1:])  # Extract original filename (after the first hyphen)
+    file_name = filename.split("_", 1)[1]  # Extract original filename (after the first underscore)
     return Response(
         content=decrypted_data,
         media_type="application/octet-stream",
